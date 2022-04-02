@@ -1,0 +1,15 @@
+{{- if .Values.server.scaling }}
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+ name: {{ include "cll-demo.server-name" . }}-hpa
+spec:
+ scaleTargetRef:
+   apiVersion: apps/v1
+   kind: Deployment
+   name: {{ include "cll-demo.server-name" . }}
+ minReplicas: {{ .Values.server.scaling.min_replicas }}
+ maxReplicas: {{ .Values.server.scaling.max_replicas }}
+ targetCPUUtilizationPercentage: {{ .Values.server.scaling.cpu_utilization }}
+{{ end }}
+ 

@@ -1,0 +1,41 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+spec:
+  serviceName: postgresql
+  selector:
+    matchLabels:
+      app: postgresql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: {{ .Values.postgres.image }}
+          volumeMounts:
+          - name: postgresql-disk
+            mountPath: /data
+          env:
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgres.env.password }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.env.username }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.env.database }}
+            - name: PGDATA
+              value: /data/pgdata
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-disk
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.postgres.storage.class }}
+        resources:
+          requests:
+            storage: {{ .Values.postgres.storage.size }}
+{{ end }}

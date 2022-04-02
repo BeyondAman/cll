@@ -1,0 +1,53 @@
+ephemeral: true
+
+client:
+  name: client
+  image: "amanupadhyay/cll-demo-client-ephemeral:v1"
+  port: 80
+  
+  healthcheck:
+    enabled: true
+    api: "/"
+
+server:
+  name: server
+  image: "amanupadhyay/cll-demo-server-ephemeral:v1"
+  port: 3030
+
+  config: 
+    TYPEORM_DATABASE: "pgdb"
+    TYPEORM_PORT: "5432"
+    REDIS_PORT: "6379"
+    PORT: "3030"
+    NODE_ENV: "production"
+
+  secrets:
+    TYPEORM_HOST: postgresql
+    TYPEORM_USERNAME: pguser
+    TYPEORM_PASSWORD: pguser
+    REDIS_HOST: redis
+
+  healthcheck:
+    enabled: true
+    api: /getVisited
+
+redis:
+  enabled: true
+  image: redis:6.2.3-alpine
+  port: "6379"
+  storage:
+    size: 500Mi
+    class: gp2
+
+postgres:
+  enabled: true
+  image: postgres:12
+  port: "5432"
+  env:
+    password: pguser
+    username: pguser
+    database: pgdb
+  storage:
+    size: 1Gi
+    class: gp2
+  

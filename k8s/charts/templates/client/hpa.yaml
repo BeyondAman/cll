@@ -1,0 +1,14 @@
+{{- if .Values.client.scaling }}
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+ name: {{ include "cll-demo.client-name" . }}-hpa
+spec:
+ scaleTargetRef:
+   apiVersion: apps/v1
+   kind: Deployment
+   name: {{ .Values.client.name }}
+ minReplicas: {{ .Values.client.scaling.min_replicas }}
+ maxReplicas: {{ .Values.client.scaling.max_replicas }}
+ targetCPUUtilizationPercentage: {{ .Values.client.scaling.cpu_utilization }}
+{{ end }}

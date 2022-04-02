@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cll-demo.client-name" . }}
+  labels:
+    app: {{ include "cll-demo.client-name" . }}
+    {{- include "cll-demo.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "cll-demo.client-name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cll-demo.client-name" . }}
+    spec:
+      containers:
+      - name: {{ include "cll-demo.client-name" . }}
+        image: {{ .Values.client.image }}
+        {{- if .Values.client.healthcheck.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.client.healthcheck.api }}
+            port: {{ .Values.client.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.client.healthcheck.api }}
+            port: {{ .Values.client.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 15
+      {{ end }}

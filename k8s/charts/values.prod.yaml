@@ -1,0 +1,69 @@
+namespace: test
+argo_namespace: argocd
+ephemeral: false
+repo_url: "https://github.com/BeyondAman/cll-demo.git"
+
+client:
+  name: client
+  image: docker.io/amanupadhyay/cll-demo-client:ca7bd55
+  port: 80
+  
+  scaling:
+    min_replicas: 3
+    max_replicas: 5
+    cpu_utilization: 80
+
+  healthcheck:
+    enabled: true
+    api: /
+
+server:
+  name: server
+  image: docker.io/amanupadhyay/cll-demo-server:ca7bd55
+  port: 3030
+  
+  config: 
+    TYPEORM_DATABASE: pgdb
+    TYPEORM_PORT: "5432"
+    REDIS_PORT: "6379"
+    NODE_ENV: production
+
+  # obtained from AWS Secret Manager - using external secrets
+  # ref: https://github.com/external-secrets/external-secrets
+  secrets:
+    db_host:
+      key: demo/db_creds
+      name: TYPEORM_HOST
+      property: TYPEORM_HOST
+      version: latest
+    db_user:
+      key: demo/db_creds
+      name: TYPEORM_USERNAME
+      property: TYPEORM_USERNAME
+      version: latest
+    db_pass:
+      key: demo/db_creds
+      name: TYPEORM_PASSWORD
+      property: TYPEORM_PASSWORD
+      version: latest
+    redis_host:
+      key: demo/redis_creds
+      name: REDIS_HOST
+      property: REDIS_HOST
+      version: latest
+
+  scaling:
+    min_replicas: 3
+    max_replicas: 5
+    cpu_utilization: 80
+
+  healthcheck:
+    enabled: true
+    api: /getVisited
+
+redis:
+  enabled: false
+
+postgres:
+  enabled: false
+

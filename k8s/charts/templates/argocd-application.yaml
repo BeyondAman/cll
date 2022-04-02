@@ -1,0 +1,19 @@
+{{- if eq .Values.ephemeral false }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ include "cll-demo.name" . }}
+  namespace: {{ .Values.argo_namespace }}
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.repo_url }}
+    targetRevision: HEAD
+    path: k8s/charts/
+    helm:
+      valueFiles:
+      - values.prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .Values.namespace }}
+{{ end }}
